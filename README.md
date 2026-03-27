@@ -2,15 +2,15 @@
 
 ### What Is It?
 
-The **Plan-Act Agent** implements a planning pattern where an LLM generates a complete reasoning and action plan *before* any tools are executed [[1]](file://Plan-Act Agent!_121.02.pdf). Unlike reactive agent loops (e.g., ReAct) that interleave thinking and acting one step at a time, Plan-Act **separates planning from execution entirely**. The planner produces a structured sequence of steps — each with defined reasoning, required tools, and intermediate evidence variables (`#E1`, `#E2`, etc.) — and then a loop executor carries out each step in order [[1]](file://Plan-Act Agent!_121.02.pdf).
+The **Plan-Act Agent** implements a planning pattern where an LLM generates a complete reasoning and action plan *before* any tools are executed. Unlike reactive agent loops (e.g., ReAct) that interleave thinking and acting one step at a time, Plan-Act **separates planning from execution entirely**. The planner produces a structured sequence of steps — each with defined reasoning, required tools, and intermediate evidence variables (`#E1`, `#E2`, etc.) — and then a loop executor carries out each step in order.
 
 This makes agent workflows more **controllable, efficient, and auditable** because:
 
 - **Fewer LLM calls** — the plan is created once, then executed deterministically step-by-step.
-- **Traceability** — explicit evidence variables (`#E1`, `#E2`, …) link outputs from earlier steps to inputs of later steps [[1]](file://Plan-Act Agent!_121.02.pdf).
-- **Deterministic processing** where appropriate (data extraction, formatting), with **judgment-based decisions** where necessary (source selection) [[1]](file://Plan-Act Agent!_121.02.pdf).
-- **Modular task decomposition** — each step calls a registered tool or worker agent, enabling reuse and composability [[1]](file://Plan-Act Agent!_121.02.pdf).
-- **Auditability** — every plan step and its output is saved as a case note, providing a full execution trace [[1]](file://Plan-Act Agent!_121.02.pdf).
+- **Traceability** — explicit evidence variables (`#E1`, `#E2`, …) link outputs from earlier steps to inputs of later steps.
+- **Deterministic processing** where appropriate (data extraction, formatting), with **judgment-based decisions** where necessary (source selection).
+- **Modular task decomposition** — each step calls a registered tool or worker agent, enabling reuse and composability.
+- **Auditability** — every plan step and its output is saved as a case note, providing a full execution trace.
 
 ### Prerequisites
 
@@ -65,7 +65,7 @@ User Prompt
        Final Output
 ```
 
-**Key components** [[1]](file://Plan-Act Agent!_121.02.pdf):
+**Key components**:
 
 | Component | Role |
 |---|---|
@@ -85,7 +85,7 @@ User Prompt
 | You need a **full audit trail** of reasoning and actions | Low-stakes, conversational Q&A |
 | You want to **minimise LLM calls** (plan once, execute many) | The task is unpredictable and requires dynamic re-planning after each observation |
 | **Deterministic, repeatable** workflows are important | Exploratory tasks where the next step depends entirely on the previous result |
-| You're building **multi-agent orchestration** or composite "Russian Doll" agents [[1]](file://Plan-Act Agent!_121.02.pdf) | Simple single-agent scenarios |
+| You're building **multi-agent orchestration** or composite "Russian Doll" agents | Simple single-agent scenarios |
 
 ---
 
@@ -117,7 +117,7 @@ The [TotalAgility connector for You.com](https://github.com/TungstenAutomationLa
 
 #### Step 3 — Configure the Tool Registry
 
-The Plan-Act agent dispatches work to tools and worker agents defined in an **Agent Tool Registry** JSON file. Update the `Set Agent Registry & Reporting Data` expression activity to include the You.com tools alongside the built-in `direct_reply` tool [[1]](file://Plan-Act Agent!_121.02.pdf).
+The Plan-Act agent dispatches work to tools and worker agents defined in an **Agent Tool Registry** JSON file. Update the `Set Agent Registry & Reporting Data` expression activity to include the You.com tools alongside the built-in `direct_reply` tool.
 
 Below is a sample registry configuration with the You.com agents included:
 
@@ -180,7 +180,7 @@ Use the following prompt to test the Plan-Act agent with the You.com tools regis
 
 ### Integration Options
 
-The Plan-Act Agent can be invoked in multiple ways [[1]](file://Plan-Act Agent!_121.02.pdf):
+The Plan-Act Agent can be invoked in multiple ways:
 
 | Method | Description |
 |---|---|
@@ -191,11 +191,11 @@ The Plan-Act Agent can be invoked in multiple ways [[1]](file://Plan-Act Agent!_
 
 ### Key Configuration Notes
 
-- **Tool Registry**: Update the `Set Agent Registry & Reporting Data` expression activity to point to your registry variable/file [[1]](file://Plan-Act Agent!_121.02.pdf).
-- **Max Loop Count**: The `At Max Loop Count?` decision node prevents runaway execution. If the loop limit is reached, the case is routed to the `Pass to Human / Error` synchronization point for human escalation [[1]](file://Plan-Act Agent!_121.02.pdf).
-- **Session Management**: The `Get Session & Set Seed` activity retrieves or creates a user session based on their email profile, propagating identity to all downstream agent/tool calls [[1]](file://Plan-Act Agent!_121.02.pdf).
-- **Error Handling**: Configure the `Pass to Human / Error` synchronization step to launch a sub-process or case for human-in-the-loop review. This must run as a separate process since the agent runs synchronously to support real-time chat responses [[1]](file://Plan-Act Agent!_121.02.pdf).
-- **Document Support**: If a document is attached, the `Fast Analysis of Attachments` sub-job analyses it before planning begins, making document content available to the planner and all subsequent steps [[1]](file://Plan-Act Agent!_121.02.pdf).
+- **Tool Registry**: Update the `Set Agent Registry & Reporting Data` expression activity to point to your registry variable/file.
+- **Max Loop Count**: The `At Max Loop Count?` decision node prevents runaway execution. If the loop limit is reached, the case is routed to the `Pass to Human / Error` synchronization point for human escalation.
+- **Session Management**: The `Get Session & Set Seed` activity retrieves or creates a user session based on their email profile, propagating identity to all downstream agent/tool calls.
+- **Error Handling**: Configure the `Pass to Human / Error` synchronization step to launch a sub-process or case for human-in-the-loop review. This must run as a separate process since the agent runs synchronously to support real-time chat responses.
+- **Document Support**: If a document is attached, the `Fast Analysis of Attachments` sub-job analyses it before planning begins, making document content available to the planner and all subsequent steps.
 
 ### Additional Resources
 
