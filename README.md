@@ -17,6 +17,30 @@ This makes agent workflows more **controllable, efficient, and auditable** becau
 - **TotalAgility 2026.1+** — You need access to a TotalAgility 2026.1 (or later) environment to import and run the Plan-Act Agent package.
 - **You.com Connector** *(recommended for the tutorial use case)* — Install the [TotalAgility connector for You.com](https://github.com/TungstenAutomationLabs/TotalAgility-connector-for-you.com-) to enable web search, deep research, and web content retrieval tools referenced in the tutorial below.
 
+### Package Contents
+
+The TotalAgility package includes the following components:
+
+| Component | Type |
+|---|---|
+| **Agent Services** | Category |
+| **Agentic Design Pattern Examples** | Category |
+| Example - Async Agent | Process |
+| Example - Sync Agent | Process |
+| Tool Use - Micro Agent | Process |
+| Example - Case Agent | Process |
+| Agent Services | Custom service group |
+| Get Session | Custom service |
+| Service - Analyse Document - sync | Process |
+| Service - Add Case Note | Custom service |
+| Planning - Plan-Act Agent | Process |
+| Agent Tool Registry | Global Variable |
+| Agent Max Loop Count | Global Variable |
+| TA Base URL | Web Service |
+| AgentWorktype | Worktype |
+
+> ⚠️ **After importing:** Update the **TA Base URL** web service to point to your TotalAgility environment, and review the **Agent Tool Registry** global variable to register the tools and worker agents available in your environment.
+
 ### How It Works
 
 The agent follows this high-level flow:
@@ -185,7 +209,8 @@ The Plan-Act Agent can be invoked in multiple ways:
 | Method | Description |
 |---|---|
 | **Generative AI Chat Control** | Map the process to a "Custom LLM" configuration under *Integration > Generative AI* and use it from a TotalAgility Form |
-| **OpenAPI REST Interface** | Call via TotalAgility's REST API (e.g., from MS Teams using the sample Teams project) |
+| **Microsoft Teams** | Call via a Tool-Use or Router "Chat Agent" exposed through the [TotalAgility MS Teams Agent](https://github.com/TungstenAutomationLabs/TotalAgility-MSTeams-Agent) sample, enabling end users to interact with the Plan-Act Agent directly from Teams |
+| **OpenAPI REST Interface** | Call via TotalAgility's REST API for programmatic integration with external applications |
 | **MCP (Model Context Protocol)** | Expose via the example MCP Proxy Server for TotalAgility |
 | **Multi-Agent Composition** | Call from other TotalAgility Agents, Cases, or Processes to create "Russian Doll" style composite agent workflows |
 

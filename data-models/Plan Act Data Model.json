@@ -1,0 +1,185 @@
+{
+  "plan_version": "1.0.0",
+  "iteration_count": 1,
+  "action_steps": [
+    {
+      "intent": "micro_agent",
+      "plan_sequence_position": 1,
+      "processID": "b2f4c8e7a9d44a5a8b7c1c3e4f5a6b7c",
+      "name": "Find authoritative Ballon d'Or winners list source",
+      "prompt_or_input_for_worker_agent": "Search for authoritative sources that provide a complete year-by-year list of Ballon d'Or winners from 1956 to present. Prefer the official Ballon d'Or (France Football / Groupe Amaury) site; secondary acceptable sources: reputable encyclopedic sources (e.g., Britannica) or Wikipedia only if official source is unavailable. Return the top 10 results with url, title, snippet, and an authority_rating field in [official, reputable_secondary, tertiary]. Return format: JSON array of objects with keys {url, title, snippet, authority_rating}.",
+      "evidence_variable": "#E1",
+      "dependencies": [],
+      "output_from_previous_steps": [],
+      "expected_output_type": "search_results",
+      "subtask_type": "deterministic",
+      "tool_selection_reason": "Selected 'Service - Internet - Web Search - async' as the narrowest-scope tool in the registry for deterministic discovery of authoritative sources via a single web query."
+    },
+    {
+      "intent": "direct_reply",
+      "plan_sequence_position": 2,
+      "processID": "c3a9d1e2f4b5467a8c9d0e1f2a3b4c5d",
+      "name": "Select canonical source URL for winners list",
+      "prompt_or_input_for_worker_agent": "Using #E1 search results, select the single best canonical URL that contains a complete year-by-year Ballon d'Or winners list from 1956 to present. Choose the highest authority_rating; if multiple official candidates exist, pick the one that clearly contains a full winners table/list. Also capture backup_url as the next-best authoritative source. Return format: JSON object with keys {canonical_url, backup_url, selection_rationale, confidence, uncertainty}.",
+      "evidence_variable": "#E2",
+      "dependencies": [],
+      "output_from_previous_steps": [
+        {
+          "evidence_variable": "#E1",
+          "output_from_step": "#E1"
+        }
+      ],
+      "expected_output_type": "structured_data",
+      "subtask_type": "non_deterministic",
+      "tool_selection_reason": "Selected 'Direct Reply' to perform a judgment-based canonical-source selection with explicit uncertainty, which is inherently non-deterministic."
+    },
+    {
+      "intent": "bot",
+      "plan_sequence_position": 3,
+      "processID": "d4e5f6a7b8c9490d8e7f6a5b4c3d2e1f",
+      "name": "Retrieve canonical winners page HTML",
+      "prompt_or_input_for_worker_agent": "Fetch the raw HTML for canonical_url from #E2. Return format: JSON object with keys {source_url, html}.",
+      "evidence_variable": "#E3",
+      "dependencies": [],
+      "output_from_previous_steps": [
+        {
+          "evidence_variable": "#E2",
+          "output_from_step": "#E2"
+        }
+      ],
+      "expected_output_type": "html_bundle",
+      "subtask_type": "deterministic",
+      "tool_selection_reason": "Selected 'Bot - Get Webpage HTML - async' because it is the most specific tool for deterministic retrieval of raw webpage HTML from a URL."
+    },
+    {
+      "intent": "direct_reply",
+      "plan_sequence_position": 4,
+      "processID": "e1f2a3b4c5d6473890a1b2c3d4e5f6a7",
+      "name": "Extract year-by-year winners from canonical HTML",
+      "prompt_or_input_for_worker_agent": "Parse the HTML from #E3 and extract a complete chronological dataset of Ballon d'Or winners from 1956 through the most recent year present on the page. For each record extract: year (as YYYY), winner_name (player name). Ensure one entry per year with no gaps; if the page includes notes about cancellations or special cases, still represent the year with the officially indicated outcome. Return format: JSON object with keys {source_url, winners} where winners is a JSON array of objects {year, winner_name}.",
+      "evidence_variable": "#E4",
+      "dependencies": [],
+      "output_from_previous_steps": [
+        {
+          "evidence_variable": "#E3",
+          "output_from_step": "#E3"
+        }
+      ],
+      "expected_output_type": "structured_data",
+      "subtask_type": "deterministic",
+      "tool_selection_reason": "Selected 'Direct Reply' to deterministically transform provided HTML into structured data (year, winner) without additional external calls."
+    },
+    {
+      "intent": "direct_reply",
+      "plan_sequence_position": 5,
+      "processID": "f7a6e5d4c3b2410f9e8d7c6b5a4f3e2d",
+      "name": "Validate completeness and fill from backup source if needed",
+      "prompt_or_input_for_worker_agent": "Validate #E4 winners array: (1) years must start at 1956; (2) years must be consecutive up to max year; (3) exactly one entry per year; (4) winner_name non-empty. If any validation fails, use backup_url from #E2 by producing an instruction set for the next step to retrieve backup HTML and merge/fill missing years, citing which years were missing. Return format: JSON object with keys {status, max_year, missing_years, duplicate_years, invalid_rows, next_action} where status is PASS|FAIL and next_action is either {type:'none'} or {type:'fetch_backup', url:<backup_url>, rationale:<text>}",
+      "evidence_variable": "#E5",
+      "dependencies": [],
+      "output_from_previous_steps": [
+        {
+          "evidence_variable": "#E2",
+          "output_from_step": "#E2"
+        },
+        {
+          "evidence_variable": "#E4",
+          "output_from_step": "#E4"
+        }
+      ],
+      "expected_output_type": "validation_report",
+      "subtask_type": "deterministic",
+      "tool_selection_reason": "Selected 'Direct Reply' for deterministic validation logic over already-extracted structured data, producing an explicit machine-actionable next_action."
+    },
+    {
+      "intent": "bot",
+      "plan_sequence_position": 6,
+      "processID": "0a1b2c3d4e5f4a6b7c8d9e0f1a2b3c4d",
+      "name": "Retrieve backup winners page HTML (conditional)",
+      "prompt_or_input_for_worker_agent": "If #E5.next_action.type == 'fetch_backup', fetch raw HTML for #E5.next_action.url; otherwise fetch raw HTML for the same canonical_url in #E2 as a no-op consistency fetch. Return format: JSON object with keys {source_url, html, conditional_executed} where conditional_executed is true if backup was fetched, else false.",
+      "evidence_variable": "#E6",
+      "dependencies": [],
+      "output_from_previous_steps": [
+        {
+          "evidence_variable": "#E2",
+          "output_from_step": "#E2"
+        },
+        {
+          "evidence_variable": "#E5",
+          "output_from_step": "#E5"
+        }
+      ],
+      "expected_output_type": "html_bundle",
+      "subtask_type": "deterministic",
+      "tool_selection_reason": "Selected 'Bot - Get Webpage HTML - async' as the specific HTML retrieval tool; step is structured to support the required backup-source recovery path without speculative additional tools."
+    },
+    {
+      "intent": "direct_reply",
+      "plan_sequence_position": 7,
+      "processID": "1b2c3d4e5f6a4b7c8d9e0f1a2b3c4d5e",
+      "name": "Extract and merge missing years from backup HTML (conditional)",
+      "prompt_or_input_for_worker_agent": "If #E5.status == 'FAIL' and #E6.conditional_executed == true, parse #E6.html and extract year-by-year Ballon d'Or winners (year as YYYY, winner_name) and use it to fill ONLY the missing_years identified in #E5, without overwriting existing valid years from #E4 unless there is a clear correction indicated. If #E5.status == 'PASS', simply pass through #E4 unchanged. Return format: JSON object with keys {primary_source_url, backup_source_url, winners} where winners is a JSON array of objects {year, winner_name} complete and consecutive from 1956 to max year.",
+      "evidence_variable": "#E7",
+      "dependencies": [],
+      "output_from_previous_steps": [
+        {
+          "evidence_variable": "#E4",
+          "output_from_step": "#E4"
+        },
+        {
+          "evidence_variable": "#E5",
+          "output_from_step": "#E5"
+        },
+        {
+          "evidence_variable": "#E6",
+          "output_from_step": "#E6"
+        }
+      ],
+      "expected_output_type": "structured_data",
+      "subtask_type": "deterministic",
+      "tool_selection_reason": "Selected 'Direct Reply' to deterministically perform conditional extraction/merge using already retrieved HTML and validation metadata, yielding a complete final dataset."
+    },
+    {
+      "intent": "direct_reply",
+      "plan_sequence_position": 8,
+      "processID": "2c3d4e5f6a7b4c8d9e0f1a2b3c4d5e6f",
+      "name": "Generate HTML document payload (normalized title/filename)",
+      "prompt_or_input_for_worker_agent": "Using #E7.winners, generate a single self-contained HTML document with title 'ballon-dor-winners-1956-present' and a table in chronological order with columns [year, winner]. Include a sources section listing primary_source_url and backup_source_url (if present). Ensure year is rendered as YYYY (ISO year component). Output a JSON payload suitable for saving: {\"FileName\":\"ballon-dor-winners-1956-present.html\",\"FileContents\":\"<html>...</html>\"}. Return format: JSON object with keys {FileName, FileContents}.",
+      "evidence_variable": "#E8",
+      "dependencies": [],
+      "output_from_previous_steps": [
+        {
+          "evidence_variable": "#E7",
+          "output_from_step": "#E7"
+        }
+      ],
+      "expected_output_type": "file_save_json",
+      "subtask_type": "deterministic",
+      "tool_selection_reason": "Selected 'Direct Reply' to deterministically render the already-verified structured dataset into the required HTML output and file-save payload."
+    },
+    {
+      "intent": "micro_agent",
+      "plan_sequence_position": 9,
+      "processID": "3d4e5f6a7b8c4d9e0f1a2b3c4d5e6f7a",
+      "name": "Save HTML file to storage",
+      "prompt_or_input_for_worker_agent": "Save the file using the JSON payload from #E8 exactly as provided. Return format: JSON object with keys {storage_container, storage_path, file_name, status, access_url}.",
+      "evidence_variable": "#E9",
+      "dependencies": [],
+      "output_from_previous_steps": [
+        {
+          "evidence_variable": "#E8",
+          "output_from_step": "#E8"
+        }
+      ],
+      "expected_output_type": "file_save_result",
+      "subtask_type": "deterministic",
+      "tool_selection_reason": "Selected 'Service - Save Text to Named File- async' as the narrowest tool specifically designed to persist provided text content to a named file."
+    }
+  ],
+  "original_prompt": "Provide a complete list of Ballon d'Or winners from its inception in 1956 to the present.  Include the year and the name of the player who won the award for each year. Return the results in chronological order in HTML.",
+  "plan_summary": "Discover authoritative sources for Ballon d'Or winners, retrieve and parse the canonical list (with backup recovery if needed), validate completeness from 1956 to present, render the chronological results into a normalized HTML document, and save it as a named file.",
+  "success_criteria": "A saved HTML file named 'ballon-dor-winners-1956-present.html' exists and contains a complete, consecutive year-by-year table from 1956 through the most recent year available, with cited source URLs.",
+  "estimated_execution_time": "2–5 minutes",
+  "variable_consumption_validation": [],
+  "naming_normalization_applied": ""
+}
