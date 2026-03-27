@@ -43,6 +43,8 @@ The TotalAgility package includes the following components:
 
 ### How It Works
 
+![Plan-Act Pattern](images/Plan-Act-Pattern.png)
+
 The agent follows this high-level flow:
 
 ```
