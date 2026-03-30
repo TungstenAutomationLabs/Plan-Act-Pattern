@@ -194,17 +194,21 @@ Below is a sample registry configuration with the You.com agents included:
       "name": "You.com - Research Agent",
       "max_invocations_per_cycle": "no limit",
       "description": "Performs multi-step autonomous research using You.com's Research Agent. The agent automatically searches the web, evaluates sources, retrieves content, and synthesizes a research response with citations."
+
+      you can add more----->>
     },
   ]
 }
 
 ```
 
-> **Note:** Replace the `<YOUR_..._PROCESS_ID>` placeholders with the actual TotalAgility process IDs from your imported You.com connector package.
+> **Note:** If you create more agent, Add more other process IDs in the same structure like above. This is like tool use pattern where you can use multiple tools or micro agents to get the desired output. 
 
 #### Step 4 — Test the Agent
 
-Use the following prompt to test the Plan-Act agent with the You.com tools registered above. This prompt exercises the full plan-act cycle: web search → source evaluation → content retrieval → data extraction → structured output.
+Use the following prompt to test the Plan-Act agent with the You.com tools registered above. This prompt exercises the full plan-act cycle: 
+
+web search → source evaluation → content retrieval → data extraction → structured output.
 
 > **Prompt:**
 >
