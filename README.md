@@ -153,40 +153,50 @@ Below is a sample registry configuration with the You.com agents included:
 
 ```json
 {
-  "agents": [
+  "agent_processes": [
     {
-      "agent_name": "direct_reply",
-      "description": "Use this when the request can be answered directly from the LLM's own knowledge without needing any external tools, searches, or data lookups. Suitable for general knowledge questions, explanations, creative writing, summarisation of provided text, or conversational replies.",
-      "process_id": "",
-      "intent": "direct_reply"
+      "intent": "direct_reply",
+      "processID": "NA",
+      "version": 1,
+      "name": "Direct Reply",
+      "max_invocations_per_cycle": "1",
+      "description": "Responds directly back to the user with the provided prompt, without any additional actions by agents."
     },
     {
-      "agent_name": "youcom_web_search",
-      "description": "Performs a real-time web search using You.com Smart Search to find current information, news, facts, or references from across the internet. Returns a set of ranked search result snippets with source URLs. Use this when the user needs up-to-date information, wants to verify a claim, or needs to discover authoritative sources on a topic.",
-      "process_id": "<YOUR_YOUCOM_SEARCH_PROCESS_ID>",
-      "intent": "sync_agent"
+      "intent": "hitl",
+      "processID": "NA",
+      "version": 1,
+      "name": "Human Review",
+      "max_invocations_per_cycle": "no limit",
+      "description": "Use this action if the input prompt can't be understood, if the prompt requests something unclear, if there is an error, or if the prompt requests something unethical or impossible."
+    },
+
+    {
+      "intent": "micro_agent",
+      "processID": "3C8E63A060C89B0E2A99B7BE5709DA61",
+      "version": 1,
+      "name": "You.com - Web Search",
+      "max_invocations_per_cycle": "no limit",
+      "description": "Performs internet search using the You.com Search API. The prompt must contain the exact search query. Returns structured search results including URLs, titles, snippets, and source domains."
     },
     {
-      "agent_name": "youcom_research",
-      "description": "Performs deep research using You.com Research mode. Synthesises information from multiple web sources into a comprehensive, cited research summary. Use this when the user needs an in-depth analysis, a literature review, a comparison of multiple perspectives, or a thorough investigation of a complex topic — not just a quick factual lookup.",
-      "process_id": "<YOUR_YOUCOM_RESEARCH_PROCESS_ID>",
-      "intent": "sync_agent"
+      "intent": "micro_agent",
+      "processID": "F5D83E6E48C653598B0665DBB76A25F0",
+      "version": 1,
+      "name": "You.com - Get Web Content",
+      "max_invocations_per_cycle": "no limit",
+      "description": "Retrieves full webpage content from URLs using You.com's content extraction API. The prompt must include one or more URLs. Returns cleaned webpage text along with metadata such as title and source URL."
     },
     {
-      "agent_name": "youcom_get_web_content",
-      "description": "Retrieves and extracts the full text content from a specific web page URL using You.com's web content retrieval service. Use this when a previous step has identified a specific URL and the full page content is needed for extraction, analysis, or summarisation. Requires a URL as input.",
-      "process_id": "<YOUR_YOUCOM_WEBCONTENT_PROCESS_ID>",
-      "intent": "sync_agent"
+      "intent": "micro_agent",
+      "processID": "0DADCA3DF0F1BF9A85081903D5AFBCB9",
+      "version": 1,
+      "name": "You.com - Research Agent",
+      "max_invocations_per_cycle": "no limit",
+      "description": "Performs multi-step autonomous research using You.com's Research Agent. The agent automatically searches the web, evaluates sources, retrieves content, and synthesizes a research response with citations."
     },
-    {
-      "agent_name": "document_analyser",
-      "description": "Analyses an uploaded document (PDF, image, etc.) to extract its content, metadata, and structure. Use this when the user has attached a file and the task requires understanding or extracting information from that document.",
-      "process_id": "<YOUR_DOC_ANALYSIS_PROCESS_ID>",
-      "intent": "sync_agent"
-    }
   ]
-}
-```
+}```
 
 > **Note:** Replace the `<YOUR_..._PROCESS_ID>` placeholders with the actual TotalAgility process IDs from your imported You.com connector package.
 
@@ -200,11 +210,86 @@ Use the following prompt to test the Plan-Act agent with the You.com tools regis
 
 **Expected Plan-Act behaviour:**
 
-1. **Step 1 — Web Search** (`youcom_web_search`): Search for "top large language models 2025 2026 by market adoption" → Evidence `#E1` (list of search results with URLs)
-2. **Step 2 — Source Evaluation** (`direct_reply`): Evaluate `#E1` and select the 3–5 most authoritative URLs → Evidence `#E2` (selected URLs)
-3. **Step 3 — Content Retrieval** (`youcom_get_web_content`): Retrieve full page content from each URL in `#E2` → Evidence `#E3` (raw page content)
-4. **Step 4 — Data Extraction** (`direct_reply`): Extract model name, developer, release date, parameter count, and use case from `#E3` → Evidence `#E4` (structured data)
-5. **Step 5 — Format Output** (`direct_reply`): Compile `#E4` into a markdown table with source citations → Final output
+{
+  "plan_version": "1.0.0",
+  "iteration_count": 1,
+  "action_steps": [
+    {
+      "intent": "micro_agent",
+      "plan_sequence_position": 1,
+      "processID": "11A3F8C6E92B4F63A4C9F11B7D001001",
+      "name": "Discover Sources for LLM Market Adoption",
+      "prompt_or_input_for_worker_agent": "Search for authoritative sources discussing the top large language models in 2025 and 2026 by market adoption or usage. Prefer reputable sources such as major AI research labs, technology publications, analyst reports, or Wikipedia summaries. Return URLs, titles, snippets, and publisher names. Return format: JSON array where each item has keys {url, title, snippet, publisher}.",
+      "evidence_variable": "#E1",
+      "dependencies": [],
+      "expected_output_type": "search_results",
+      "subtask_type": "deterministic",
+      "tool_selection_reason": "Selected 'Worker Agent - Web Search' to discover authoritative sources discussing large language model adoption trends."
+    },
+    {
+      "intent": "direct_reply",
+      "plan_sequence_position": 2,
+      "processID": "22B4C9D1A8F6472C9A8E1CBB70020002",
+      "name": "Evaluate and Select Authoritative Sources",
+      "prompt_or_input_for_worker_agent": "Using #E1, evaluate the credibility of the returned sources and select the 3 to 5 most authoritative URLs discussing large language models in 2025–2026. Prefer official AI company publications, well-known technology research outlets, and widely cited reference sources. Return JSON object: { \"selected_urls\": [\"...\"], \"selection_reasoning\": \"brief explanation\", \"confidence\": 0-1 }. ",
+      "evidence_variable": "#E2",
+      "dependencies": ["#E1"],
+      "expected_output_type": "structured_data",
+      "subtask_type": "non_deterministic",
+      "tool_selection_reason": "Direct LLM reasoning is best suited for evaluating credibility and selecting authoritative sources."
+    },
+    {
+      "intent": "micro_agent",
+      "plan_sequence_position": 3,
+      "processID": "33C7DA4B5E714B52A26F27A4B0030003",
+      "name": "Retrieve Webpage Content",
+      "prompt_or_input_for_worker_agent": "Using #E2.selected_urls, retrieve the full page content from each URL. Return JSON object where each key is the URL and each value contains the raw webpage content. Include metadata if available. Return format: { pages: [{url, title, content}] }.",
+      "evidence_variable": "#E3",
+      "dependencies": ["#E2"],
+      "expected_output_type": "web_content_bundle",
+      "subtask_type": "deterministic",
+      "tool_selection_reason": "Selected 'Worker Agent - Get Webpage Content' to retrieve raw article content for analysis."
+    },
+    {
+      "intent": "direct_reply",
+      "plan_sequence_position": 4,
+      "processID": "44D8AB91C7C54836A2E9E11400040004",
+      "name": "Extract LLM Metadata",
+      "prompt_or_input_for_worker_agent": "Using #E3, extract structured information about the large language models mentioned in the retrieved sources. For each model extract: model_name, developer, release_year, estimated_parameter_count (if mentioned), primary_use_case, and source_url. Return JSON array where each item has keys {model_name, developer, release_year, parameter_count, primary_use_case, source_url}.",
+      "evidence_variable": "#E4",
+      "dependencies": ["#E3"],
+      "expected_output_type": "structured_data",
+      "subtask_type": "deterministic",
+      "tool_selection_reason": "Direct LLM reply is used to perform structured extraction from unstructured webpage text."
+    },
+    {
+      "intent": "direct_reply",
+      "plan_sequence_position": 5,
+      "processID": "55E9BC0FAF7D4A67A4B1022200050005",
+      "name": "Generate LLM Comparison Table",
+      "prompt_or_input_for_worker_agent": "Using #E4, compile a markdown table summarizing the large language models identified. Table columns must include: Model Name, Developer, Release Year, Parameter Count, Primary Use Case, Source. Deduplicate repeated models and keep the most authoritative source citation.",
+      "evidence_variable": "#E5",
+      "dependencies": ["#E4"],
+      "expected_output_type": "markdown_table",
+      "subtask_type": "deterministic",
+      "tool_selection_reason": "Direct LLM reply selected for deterministic formatting and summarization."
+    }
+  ],
+  "plan_summary": "A Plan–Act workflow that discovers authoritative sources about large language models in 2025–2026, evaluates the most credible sources, retrieves webpage content, extracts structured metadata about each model, and generates a summarized markdown comparison table.",
+  "success_criteria": "A markdown table listing the top large language models with developer, release year, parameter count, use case, and source citation.",
+  "estimated_execution_time": "1–3 minutes",
+  "variable_consumption_validation": {
+    "forward_check": "PASS",
+    "backward_check": "PASS",
+    "orphan_check": "PASS",
+    "details": "All evidence variables #E1–#E5 are produced and consumed sequentially without orphan variables."
+  },
+  "naming_normalization_applied": {
+    "dataset_name": "llm-market-adoption-2025-2026",
+    "validation_regex": "^[a-z][a-z0-9_-]{0,62}[a-z0-9]$",
+    "status": "PASS"
+  }
+}
 
 ---
 
