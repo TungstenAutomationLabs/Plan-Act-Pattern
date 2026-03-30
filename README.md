@@ -294,7 +294,7 @@ Use the following prompt to test the Plan-Act agent with the You.com tools regis
     "status": "PASS"
   }
 }
----
+```
 
 ### Integration Options
 
@@ -451,5 +451,3 @@ This companion repository provides a catalogue of reusable agent design patterns
 - **Integration examples** — Samples for connecting agents via REST APIs, MCP, Generative AI Chat Controls, and multi-agent composition.
 
 Use it as a starting point for exploring which agentic patterns best fit your automation use cases, and as a library of building blocks for constructing your own TotalAgility agent workflows.
-
----
