@@ -39,6 +39,8 @@ The TotalAgility package includes the following components:
 | TA Base URL | Web Service |
 | AgentWorktype | Worktype |
 
+> **Package note:** `MDcleaner.dll` is included in the package for markdown cleanup and formatting utilities. The `Strip MD formatting` `.NET` activity uses the `MDcleaner.Utils.StripMarkdownCodeBlock` method to remove markdown code block formatting.
+
 > ⚠️ **After importing:** Update the **TA Base URL** web service to point to your TotalAgility environment, and review the **Agent Tool Registry** global variable to register the tools and worker agents available in your environment.
 
 ### How It Works
