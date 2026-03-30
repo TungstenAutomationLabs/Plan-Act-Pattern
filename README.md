@@ -4,7 +4,7 @@
 
 ![Plan-Act](images/the-agentic-ai-planning-pattern-1.jpg)
 
-The **Plan-Act Agent** is an agentic AI design pattern that **separates planning from execution entirely**. Instead of diving directly into step-by-step reasoning and tool use (as reactive patterns like ReAct do), a Plan-Act agent first takes a step back and constructs a **complete, structured plan up front** — deciding all the necessary steps, what tools to call, and in what order — *before* any tools are executed  .
+The **Plan-Act Agent** is an agentic AI design pattern that **separates planning from execution entirely**. Instead of diving directly into step-by-step reasoning and tool use (as reactive patterns like Plan-Act-Reflect-Repeat do), a Plan-Act agent first takes a step back and constructs a **complete, structured plan up front** — deciding all the necessary steps, what tools to call, and in what order — *before* any tools are executed  .
 
 The planner (an LLM) produces a sequence of steps, each with:
 
@@ -109,7 +109,7 @@ User Prompt
 
 ### When Should You Use It?
 
-| Use Plan-Act When… | Use a Simpler Pattern (e.g., ReAct / Tool-Use) When… |
+| Use Plan-Act When… | Use a Simpler Pattern When… |
 |---|---|
 | The task requires **multiple coordinated steps** (research → extract → format) | A single tool call or direct LLM reply is sufficient |
 | You need a **full audit trail** of reasoning and actions | Low-stakes, conversational Q&A |
@@ -318,7 +318,7 @@ The final output: a valid HTML document containing two fully formatted tables:
 
 You might be wondering: why does Plan-Act reason **without** waiting for observations, rather than the traditional approach of reasoning **with** observations?
 
-| | **Reasoning With Observation** (ReAct) | **Reasoning Without Observation** (Plan-Act) |
+| | **Reasoning With Observation** (Plan-Act-Reflect-Repeat) | **Reasoning Without Observation** (Plan-Act) |
 |---|---|---|
 | **How it works** | The LLM generates a thought → executes a tool → **waits** for the observation → feeds it back into the prompt → decides the next step | The **Planner** generates a complete blueprint of all steps upfront → the **Worker** executes them independently → the **Solver** synthesizes the final answer |
 | **Flow** | Stop-and-go loop: Think → Act → Observe → Think → Act → Observe → … | Single pass: Plan (once) → Execute (all steps) → Solve |
@@ -331,7 +331,7 @@ In the F1 example above, pausing after each step to "rethink" would add no value
 
 Plan-Act does **not** aim to replace interactive reasoning patterns — it **complements** them.
 
-| Use Plan-Act when… | Use ReAct / Reactive when… |
+| Use Plan-Act when… | Use Plan-Act-Reflect-Repeat / Reactive when… |
 |---|---|
 | The required steps are predictable | The environment is dynamic and unpredictable |
 | Tools have well-defined contracts | Discovery and exploration are needed |
@@ -356,7 +356,7 @@ For more agentic design patterns and reference implementations for TotalAgility,
 
 This companion repository provides a catalogue of reusable agent design patterns built on TotalAgility, including:
 
-- **Pattern overviews** — Descriptions and rationale for each agentic pattern (e.g., Tool-Use, ReAct, Plan-Act, Reflection, Multi-Agent Orchestration).
+- **Pattern overviews** — Descriptions and rationale for each agentic pattern (e.g. Plan-Act-Reflect-Repeat, Tool-Use, Plan-Act, Reflection, Multi-Agent Orchestration).
 - **Reference implementations** — Importable TotalAgility packages demonstrating each pattern.
 - **Prompt templates** — Reusable system and planner prompts tailored to each pattern.
 - **Data models** — JSON schemas for tool registries, plan structures, and evidence tracking.
