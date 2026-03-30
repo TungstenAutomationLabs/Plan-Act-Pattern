@@ -2,7 +2,7 @@
 
 ### What Is It?
 
-![Plan-Act](the-agentic-ai-planning-pattern-1.jpg)
+![Plan-Act](images/the-agentic-ai-planning-pattern-1.jpg)
 
 The **Plan-Act Agent** is an agentic AI design pattern that **separates planning from execution entirely**. Instead of diving directly into step-by-step reasoning and tool use (as reactive patterns like ReAct do), a Plan-Act agent first takes a step back and constructs a **complete, structured plan up front** — deciding all the necessary steps, what tools to call, and in what order — *before* any tools are executed  .
 
