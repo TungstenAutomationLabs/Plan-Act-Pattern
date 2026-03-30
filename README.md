@@ -226,7 +226,7 @@ The Plan-Act Agent can be invoked in multiple ways:
 - **Error Handling**: Configure the `Pass to Human / Error` synchronization step to launch a sub-process or case for human-in-the-loop review. This must run as a separate process since the agent runs synchronously to support real-time chat responses.
 - **Document Support**: If a document is attached, the `Fast Analysis of Attachments` sub-job analyses it before planning begins, making document content available to the planner and all subsequent steps.
 
-### 🏗️ How It Works: Three Roles
+### 🏗️ How Plan-Act Works: Three Roles
 
 At the heart of the Plan-Act Framework are three distinct roles:
 
@@ -254,7 +254,7 @@ The Plan-Act Framework reframes agentic intelligence as something that can be ex
 
 > *Source for benchmarks: [arXiv:2305.18323](https://arxiv.org/abs/2305.18323)*
 
-### 🏎️ Example: 2025 F1 Standings → HTML Report
+### Other Example: 2025 F1 Standings → HTML Report
 
 To make the pattern concrete, here's a real end-to-end walkthrough. The task given to the agent:
 
@@ -276,11 +276,6 @@ The Planner broke the high-level task into a structured sequence of 7 steps — 
 
 The framework explicitly planned every micro-action while maintaining dependencies between steps, ensuring each step had the required evidence from previous steps.
 
-**Here's what the raw plan JSON looks like:**
-
-![Plan JSON output showing all 7 action steps with their evidence variables, dependencies, and tool assignments](screenshots/plan-output.png)
-<!-- Replace with your actual screenshot path -->
-
 #### ⚙️ Execution Phase (Act)
 
 Each micro-agent carried out its designated task in sequence — no re-reasoning, no redundant LLM calls:
@@ -298,15 +293,10 @@ The Worker simply followed the plan. Intermediate outputs (search results → UR
 
 #### 📊 Output
 
-**Generated HTML source code:**
-
-![Raw HTML output showing table markup for both driver and constructor standings](screenshots/html-output.png)
-<!-- Replace with your actual screenshot path -->
-
 **Compiled HTML rendered in browser:**
 
-![Compiled HTML showing 2025 F1 Driver Standings table (21 drivers) and Constructor Standings table (10 teams)](screenshots/compiled-html.png)
-<!-- Replace with your actual screenshot path -->
+![Compiled HTML showing 2025 F1 Driver Standings table (21 drivers) and Constructor Standings table (10 teams)](images/image.png)
+
 
 The final output: a valid HTML document containing two fully formatted tables:
 
