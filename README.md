@@ -196,7 +196,9 @@ Below is a sample registry configuration with the You.com agents included:
       "description": "Performs multi-step autonomous research using You.com's Research Agent. The agent automatically searches the web, evaluates sources, retrieves content, and synthesizes a research response with citations."
     },
   ]
-}```
+}
+
+```
 
 > **Note:** Replace the `<YOUR_..._PROCESS_ID>` placeholders with the actual TotalAgility process IDs from your imported You.com connector package.
 
@@ -209,6 +211,8 @@ Use the following prompt to test the Plan-Act agent with the You.com tools regis
 > *"Research the top 5 large language models released in 2025–2026 by market adoption. For each model, find the developer, release date, parameter count (if public), and primary use case. Use web search to discover the models, retrieve the content from the most authoritative source for each, and compile the results into a structured markdown table. Cite your sources."*
 
 **Expected Plan-Act behaviour:**
+
+```json
 
 {
   "plan_version": "1.0.0",
@@ -290,7 +294,6 @@ Use the following prompt to test the Plan-Act agent with the You.com tools regis
     "status": "PASS"
   }
 }
-
 ---
 
 ### Integration Options
